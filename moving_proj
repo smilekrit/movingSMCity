@@ -1,0 +1,115 @@
+#define degreex 25
+#define speedX 200
+#include <NewPing.h>
+int left;
+int right;
+int line_sens = 0;
+ int distance;
+ int prTurn;
+NewPing dalekohoh(7,8,400);
+void setup() {
+ 
+    pinMode(3, OUTPUT);
+    pinMode(5, OUTPUT);
+    pinMode(6, OUTPUT);
+    pinMode(10, OUTPUT);
+    pinMode(11, OUTPUT);
+    pinMode(12, OUTPUT);
+    pinMode(13, OUTPUT);
+    Serial.begin(9600);
+}
+
+void loop() {
+    distance = dalekohoh.ping_cm();  
+
+    if(distance>10) {
+    line_sens = line();
+
+    if(line_sens == 0){
+      moveX(1,speedX);
+    }
+    if(line_sens == 1){
+      turn(0,speedX,degreex);
+    }
+    if(line_sens == 2){
+      turn(1,speedX,degreex);
+    }
+    if(line_sens == 3){
+      turn(prTurn, speedX,degreex);
+    }
+      
+    }else{
+      moveX(0,0);
+    }
+  
+
+
+  // put your main code here, to run repeatedly:
+
+}
+
+
+
+
+void portHIGH(int port){
+
+  digitalWrite(port,HIGH);
+  
+}
+void portLOW(int port){
+
+  digitalWrite(port,LOW);
+  
+}
+
+
+void moveX(int direct, int velocity){
+
+  digitalWrite(12, direct); 
+  digitalWrite(13, direct);
+  analogWrite(10, velocity);
+  analogWrite(11, velocity);
+  
+  
+  
+}
+int line(){
+  
+
+left = analogRead(A0);
+right = analogRead(A5);
+
+if(left > 200 && right > 200){
+    return 0;
+  }
+if(left < 200 && right > 200){
+    return 1;
+  }
+if(left > 200 && right < 200){
+    return 2;
+  }
+if(left < 200 && right < 200){
+    return 3;
+  }
+  return 127;
+}
+
+void turn(int direct, float velocity, int degree){
+  prTurn = direct;
+  
+  digitalWrite(12, 1); 
+  digitalWrite(13, 1);
+  if(direct !=0){
+        
+  analogWrite(10, 0.3*velocity);
+  analogWrite(11, velocity);
+  }else{
+    
+  analogWrite(10, velocity);
+  analogWrite(11, 0.3*velocity);
+  }
+
+  delay(degree);
+   analogWrite(10, 0);
+  analogWrite(11, 0);
+}
